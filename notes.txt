@@ -1,0 +1,177 @@
+Resources:
+
+https://github.com/in28minutes/devops-master-class
+
+Terraform:
+
+PS D:\Users\Anand\terraform\devops-master-class\terraform\backup\01-terraform-basics> SET AWS_ACCESS_KEY_ID=AKIA2FV46J6LWYWB6OXP
+
+PS D:\Users\Anand\terraform\devops-master-class\terraform\backup\01-terraform-basics> SET AWS_SECRET_ACCESS_KEY=7NdzPlZlasMKaCIPOAPCBIzxyPr0q7OOVDhP/Fai
+
+terraform apply -refresh=false
+	- this will not apply your changes.
+
+terraform plan -out iam.tfplan
+	- above command stores the o/p to iam.tfplan. tfplan is the extension to store output of plan.
+	
+terraform apply "iam.tfplan"
+	- execute the iam.tfplan
+	- execution is faster
+	
+terraform apply -target="aws_iam_user.my_iam_user"
+	- execute this when i know only this thing has changed.
+	
+	
+terraform.tfstate - contains the state after successful execution of terraform apply.
+terraform.tfstate.backup - contains the state before successful execution of terraform apply.
+                           meaning previous successful execution.
+						   
+Note: Never make any direct changes to .tfstate files.
+
+Terraform states:
+
+DESIRED - KNOWN - ACTUAL
+
+KNOWN means .tfstate file
+
+
+Terraform uses unique id of any resource to match it with the resource in cloud.
+
+We should not commit .terraform folder and .tfstate and .tfstate.backup in git.
+as they might contain sensitive version.
+
+Hence
+
+# terraform excludes
+*.tfstate
+*.tfstate.backup
+.terraform
+
+outputs.tf file contains whatever you want to print as output in console
+
+output "my_s3_bucket_versioning" {
+    value = aws_s3_bucket.my_s3_bucket.versioning[0].enabled
+}
+
+output "my_s3_bucket_complete_details" {
+    value = aws_s3_bucket.my_s3_bucket
+}
+
+output "my_iam_user_complete_details" {
+    value = aws_iam_user.my_iam_user
+}
+
+When we do terraform plan or terraform apply, it concanates all the .tf files into one file
+and then execute it.
+
+===================
+
+PS D:\Users\Anand\terraform\devops-master-class\terraform\backup\01-terraform-basics> terraform plan -refresh=false
+
+No changes. Your infrastructure matches the configuration.
+
+Terraform has compared your real infrastructure against your configuration and found no
+differences, so no changes are needed.
+
+====================
+
+terraform destroy
+
+deletes all the resources in the cloud.
+
+====================
+
+terraform validate
+
+is used to check if the syntax is correct in your terraform project
+
+PS D:\Users\Anand\terraform\devops-master-class\terraform\backup\02-more-terraform-basics> terraform validate
+Success! The configuration is valid.
+
+====================
+
+terraform fmt
+
+to format the files. By default, it leaves 2 spaces for indentation.
+
+PS D:\Users\Anand\terraform\devops-master-class\terraform\backup\02-more-terraform-basics> terraform fmt
+main.tf
+
+====================
+
+terraform show
+
+gives the human readable output of current state. it works only after apply
+
+PS D:\Users\Anand\terraform\devops-master-class\terraform\backup\02-more-terraform-basics> terraform show
+# aws_iam_user.my_iam_users[0]:
+resource "aws_iam_user" "my_iam_users" {
+    arn           = "arn:aws:iam::699402178455:user/VALUE_FROM_TERRAFORM_TFVARS_0"
+    force_destroy = false
+    id            = "VALUE_FROM_TERRAFORM_TFVARS_0"
+    name          = "VALUE_FROM_TERRAFORM_TFVARS_0"
+    path          = "/"
+    tags_all      = {}
+    unique_id     = "AIDA2FV46J6LWSMB5OUI7"
+}
+
+=====================
+
+when you define variables
+
+variable "iam_user_name_prefix" {
+  type    = string #any, number, bool, list, map, set, object, tuple
+  default = "my_iam_user"
+}
+
+provider "aws" {
+  region = "us-east-1"
+  //version = "~> 2.46" (No longer necessary)
+}
+
+resource "aws_iam_user" "my_iam_users" {
+  count = 1
+  name  = "${var.iam_user_name_prefix}_${count.index}"
+}
+
+terraform apply -refresh=false
+
+terraform console
+
+and then
+
+terraform
+
+>var.iam_user_name_prefix
+
+
+
+=====================
+other way to pass variable's value is via command line
+
+terraform apply -refresh=false -var="iam_user_name_prefix=VALUE_FROM_TERRAFORM_TFVARS"	
+
+=====================
+
+mkdir ~/aws
+mkdir ~/aws_keys
+mv default-ec2.pem ~/aws/aws_keys/
+
+resource "aws_instance" "http_server" {
+  #ami                   = "ami-062f7200baf2fa504"
+  ami                    = data.aws_ami.aws_linux_2_latest.id
+  key_name               = "default-ec2"
+  ...
+  ...
+  }
+  
+======================
+
+Refer project 05-ec2-instances to see how
+main.tf, data-provider.tf, outputs.tf, variables.tf
+are separated out as a good programming practice.
+	
+
+
+
+
