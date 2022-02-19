@@ -4,9 +4,9 @@ https://github.com/in28minutes/devops-master-class
 
 Terraform:
 
-PS D:\Users\Anand\terraform\devops-master-class\terraform\backup\01-terraform-basics> SET AWS_ACCESS_KEY_ID=AKIA2FV46J6LWYWB6OXP
+PS D:\Users\Anand\terraform\devops-master-class\terraform\backup\01-terraform-basics> SET AWS_ACCESS_KEY_ID=<value>
 
-PS D:\Users\Anand\terraform\devops-master-class\terraform\backup\01-terraform-basics> SET AWS_SECRET_ACCESS_KEY=7NdzPlZlasMKaCIPOAPCBIzxyPr0q7OOVDhP/Fai
+PS D:\Users\Anand\terraform\devops-master-class\terraform\backup\01-terraform-basics> SET AWS_SECRET_ACCESS_KEY=<value>
 
 terraform apply -refresh=false
 	- this will not apply your changes.
